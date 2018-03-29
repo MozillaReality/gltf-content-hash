@@ -1,4 +1,4 @@
-# gltf-component-data
+# gltf-content-hash
 
 Small library and command line utility for adding content hashes to images/bin chunks in glTF files.
 
