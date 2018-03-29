@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+
+const program = require("commander");
+const contentHashUrls = require("../src/index");
+const fs = require("fs-extra");
+const path = require("path");
+const package = fs.readJSONSync(path.join(__dirname, "..", "package.json"));
+
+program
+  .version(package.version)
+  .usage('<gltfPath> [options]')
+  .option("-o, --out <out>", "The directory to output the modified glTF file and images. Defaults to the existing glTF path.")
+  .action((gltfPath, options) => {
+    execute(gltfPath, options.out).then(() => {
+      process.exit(0);
+    }).catch((err) => {
+      throw err;
+    });
+  });
+
+async function execute(gltfPath, outPath) {
+  if (!fs.existsSync(gltfPath)) {
+    throw new Error(`gltf file: ${gltfPath} does not exist`);
+  }
+
+  let finalOutPath = outPath || path.dirname(gltfPath);
+
+  const inputGltf = await fs.readJson(gltfPath);
+
+  const { gltf, fileName } = await contentHashUrls(gltfPath, inputGltf, finalOutPath);
+
+  const finalGltfPath = path.join(finalOutPath, fileName);
+  await fs.outputJson(finalGltfPath, gltf);
+}
+
+program.parse(process.argv);
+
+if (program.args.length === 0) {
+  program.outputHelp();
+}
