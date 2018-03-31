@@ -10,11 +10,11 @@ import fs from "fs";
 import contentHashUrls from "gltf-content-hash";
 
 const gltfPath = path.join(__dirname, "mygltf.gltf");
-const imagesOutputDirectory = path.join(__dirname, "out");
+const out = path.join(__dirname, "out");
 const inGltf = JSON.parse(fs.readFileSync());
 
 // Modifies uris in gltf and writes images to the output directory.
-const { gltf, fileName } = await contentHashUrls(gltfPath, inGltf, imagesOutputDirectory);
+const { gltf, fileName } = await contentHashUrls(gltfPath, inGltf, { out });
 ```
 
 ## CLI Usage
@@ -29,6 +29,7 @@ Usage: gltf-content-hash <gltfPath> [options]
   Options:
 
     -V, --version    output the version number
+    -r --rename      Rename the gltf file and images in-place.
     -o, --out <out>  The directory to output the modified glTF file and images. Defaults to the existing glTF path.
     -h, --help       output usage information
 ```

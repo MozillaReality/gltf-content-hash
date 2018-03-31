@@ -2,15 +2,21 @@ const path = require("path");
 const fs = require("fs-extra");
 const crypto = require("crypto");
 
-async function contentHashUrls(gltfPath, gltf, imagesOutputPath) {
+async function contentHashUrls(gltfPath, gltf, options) {
   const gltfDir = path.dirname(gltfPath);
-  let outputPath = imagesOutputPath || gltfDir;
+
+  const opts = Object.assign({
+    rename: false,
+    out: gltfDir
+  }, options);
+
+  const outputPath = opts.out;
 
   if (gltf.images) {
     for (const image  of gltf.images) {
       if (image.uri) {
         const imagePath = path.join(gltfDir, image.uri);
-        image.uri = await contentHashAndCopy(imagePath, outputPath);
+        image.uri = await contentHashAndCopy(imagePath, outputPath, opts.rename);
       }
     }
   }
@@ -19,7 +25,7 @@ async function contentHashUrls(gltfPath, gltf, imagesOutputPath) {
     for (const buffer  of gltf.buffers) {
       if (buffer.uri) {
         const bufferPath = path.join(gltfDir, buffer.uri);
-        buffer.uri = await contentHashAndCopy(bufferPath, outputPath);
+        buffer.uri = await contentHashAndCopy(bufferPath, outputPath, opts.rename);
       }
     }
   }
@@ -33,10 +39,16 @@ async function contentHashUrls(gltfPath, gltf, imagesOutputPath) {
   };
 }
 
-async function contentHashAndCopy(resourcePath, outputPath) {
+async function contentHashAndCopy(resourcePath, outputPath, move) {
   const content = await fs.readFile(resourcePath);
   const fileName = makeFileName(resourcePath, content);
-  fs.copy(resourcePath, path.join(outputPath, fileName));
+
+  if (move) {
+    await fs.move(resourcePath, path.join(outputPath, fileName));
+  } else {
+    await fs.copy(resourcePath, path.join(outputPath, fileName));
+  }
+
   return fileName;
 }
 

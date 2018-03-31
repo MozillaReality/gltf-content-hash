@@ -9,27 +9,33 @@ const package = fs.readJSONSync(path.join(__dirname, "..", "package.json"));
 program
   .version(package.version)
   .usage('<gltfPath> [options]')
+  .option("-r --rename", "Rename the gltf file and images in-place.")
   .option("-o, --out <out>", "The directory to output the modified glTF file and images. Defaults to the existing glTF path.")
   .action((gltfPath, options) => {
-    execute(gltfPath, options.out).then(() => {
+    execute(gltfPath, options).then(() => {
       process.exit(0);
     }).catch((err) => {
       throw err;
     });
   });
 
-async function execute(gltfPath, outPath) {
+async function execute(gltfPath, options) {
   if (!fs.existsSync(gltfPath)) {
     throw new Error(`gltf file: ${gltfPath} does not exist`);
   }
 
-  let finalOutPath = outPath || path.dirname(gltfPath);
+  let finalOutPath = options.out || path.dirname(gltfPath);
 
   const inputGltf = await fs.readJson(gltfPath);
 
-  const { gltf, fileName } = await contentHashUrls(gltfPath, inputGltf, finalOutPath);
+  const { gltf, fileName } = await contentHashUrls(gltfPath, inputGltf, options);
 
   const finalGltfPath = path.join(finalOutPath, fileName);
+
+  if (options.rename) {
+    await fs.move(gltfPath, finalGltfPath, { overwrite: true });
+  }
+
   await fs.outputJson(finalGltfPath, gltf);
 }
 
