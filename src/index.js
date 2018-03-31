@@ -44,9 +44,9 @@ async function contentHashAndCopy(resourcePath, outputPath, move) {
   const fileName = makeFileName(resourcePath, content);
 
   if (move) {
-    await fs.move(resourcePath, path.join(outputPath, fileName));
+    await fs.move(resourcePath, path.join(outputPath, fileName), { overwrite: true });
   } else {
-    await fs.copy(resourcePath, path.join(outputPath, fileName));
+    await fs.copy(resourcePath, path.join(outputPath, fileName), { overwrite: true });
   }
 
   return fileName;
