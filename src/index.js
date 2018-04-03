@@ -56,7 +56,12 @@ function makeFileName(resourcePath, content) {
   const { name, ext } = path.parse(resourcePath);
   const hash = crypto.createHash("md5");
   const digest = hash.update(content).digest('hex').substr(0, 10);
-  return name + "-" + digest + ext;
+
+  if (ext === ".gltf") {
+    return name + "-" + digest + ext;
+  }
+
+  return digest + ext;
 }
 
 module.exports = contentHashUrls;
