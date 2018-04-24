@@ -1,6 +1,6 @@
 {
   "name": "gltf-content-hash",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "bin": "bin/gltf-content-hash",
   "main": "src/index.js",
   "license": "MPL-2.0",
