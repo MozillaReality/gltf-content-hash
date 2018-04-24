@@ -16,14 +16,27 @@ async function contentHashUrls(gltfPath, gltf, options) {
   const outputPath = opts.out;
 
   if (gltf.images) {
+    const uniqueImageUris = new Set();
+    const contentHashedUriMap = {};
+
     for (const image of gltf.images) {
       if (image.uri) {
-        const imagePath = path.join(gltfDir, image.uri);
-        image.uri = await contentHashAndCopy(
-          imagePath,
-          outputPath,
-          opts.rename
-        );
+        uniqueImageUris.add(image.uri);
+      }
+    }
+
+    for (const uniqueUri of uniqueImageUris) {
+      const imagePath = path.join(gltfDir, uniqueUri);
+      contentHashedUriMap[uniqueUri] = await contentHashAndCopy(
+        imagePath,
+        outputPath,
+        opts.rename
+      );
+    }
+
+    for (const image of gltf.images) {
+      if (image.uri) {
+        image.uri = contentHashedUriMap[image.uri];
       }
     }
   }
@@ -51,6 +64,8 @@ async function contentHashUrls(gltfPath, gltf, options) {
 }
 
 async function contentHashAndCopy(resourcePath, outputPath, move) {
+  console.log("contentHashAndCopy", resourcePath, outputPath, move);
+
   const content = await fs.readFile(resourcePath);
   const fileName = hashFileName(resourcePath, content);
 
