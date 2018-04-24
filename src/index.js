@@ -64,8 +64,6 @@ async function contentHashUrls(gltfPath, gltf, options) {
 }
 
 async function contentHashAndCopy(resourcePath, outputPath, move) {
-  console.log("contentHashAndCopy", resourcePath, outputPath, move);
-
   const content = await fs.readFile(resourcePath);
   const fileName = hashFileName(resourcePath, content);
 
