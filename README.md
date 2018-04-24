@@ -7,7 +7,7 @@ Small library and command line utility for adding content hashes to images/bin c
 ```js
 import path from "path";
 import fs from "fs";
-import contentHashUrls from "gltf-content-hash";
+import { contentHashUrls } from "gltf-content-hash";
 
 const gltfPath = path.join(__dirname, "mygltf.gltf");
 const out = path.join(__dirname, "out");

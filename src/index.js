@@ -5,33 +5,44 @@ const crypto = require("crypto");
 async function contentHashUrls(gltfPath, gltf, options) {
   const gltfDir = path.dirname(gltfPath);
 
-  const opts = Object.assign({
-    rename: false,
-    out: gltfDir
-  }, options);
+  const opts = Object.assign(
+    {
+      rename: false,
+      out: gltfDir
+    },
+    options
+  );
 
   const outputPath = opts.out;
 
   if (gltf.images) {
-    for (const image  of gltf.images) {
+    for (const image of gltf.images) {
       if (image.uri) {
         const imagePath = path.join(gltfDir, image.uri);
-        image.uri = await contentHashAndCopy(imagePath, outputPath, opts.rename);
+        image.uri = await contentHashAndCopy(
+          imagePath,
+          outputPath,
+          opts.rename
+        );
       }
     }
   }
 
   if (gltf.buffers) {
-    for (const buffer  of gltf.buffers) {
+    for (const buffer of gltf.buffers) {
       if (buffer.uri) {
         const bufferPath = path.join(gltfDir, buffer.uri);
-        buffer.uri = await contentHashAndCopy(bufferPath, outputPath, opts.rename);
+        buffer.uri = await contentHashAndCopy(
+          bufferPath,
+          outputPath,
+          opts.rename
+        );
       }
     }
   }
 
   const content = JSON.stringify(gltf);
-  const fileName = makeFileName(gltfPath, content);
+  const fileName = hashFileName(gltfPath, content);
 
   return {
     gltf,
@@ -41,21 +52,28 @@ async function contentHashUrls(gltfPath, gltf, options) {
 
 async function contentHashAndCopy(resourcePath, outputPath, move) {
   const content = await fs.readFile(resourcePath);
-  const fileName = makeFileName(resourcePath, content);
+  const fileName = hashFileName(resourcePath, content);
 
   if (move) {
-    await fs.move(resourcePath, path.join(outputPath, fileName), { overwrite: true });
+    await fs.move(resourcePath, path.join(outputPath, fileName), {
+      overwrite: true
+    });
   } else {
-    await fs.copy(resourcePath, path.join(outputPath, fileName), { overwrite: true });
+    await fs.copy(resourcePath, path.join(outputPath, fileName), {
+      overwrite: true
+    });
   }
 
   return fileName;
 }
 
-function makeFileName(resourcePath, content) {
+function hashFileName(resourcePath, content) {
   const { name, ext } = path.parse(resourcePath);
   const hash = crypto.createHash("md5");
-  const digest = hash.update(content).digest('hex').substr(0, 10);
+  const digest = hash
+    .update(content)
+    .digest("hex")
+    .substr(0, 10);
 
   if (ext === ".gltf") {
     return name + "-" + digest + ext;
@@ -64,4 +82,8 @@ function makeFileName(resourcePath, content) {
   return digest + ext;
 }
 
-module.exports = contentHashUrls;
+module.exports = {
+  contentHashUrls,
+  hashFileName,
+  contentHashAndCopy
+};

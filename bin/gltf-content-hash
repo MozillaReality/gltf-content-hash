@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const program = require("commander");
-const contentHashUrls = require("../src/index");
+const { contentHashUrls } = require("../src/index");
 const fs = require("fs-extra");
 const path = require("path");
 const package = fs.readJSONSync(path.join(__dirname, "..", "package.json"));

@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs-extra");
 const assert = require('assert');
-const contentHashUrls = require("../src/index");
+const { contentHashUrls } = require("../src/index");
 const { execFile } = require('child_process');
 
 const gltfDir = path.join(__dirname, "assets");
@@ -45,7 +45,7 @@ describe('gltf-content-hash', () => {
     assert.ok(outGltfFilename);
 
     const gltf = await fs.readJson(path.join(tmpDir, outGltfFilename));
-    assert.equal(gltf.images[0].uri, "Avocado_baseColor-4e5d4d4009.png");
+    assert.equal(gltf.images[0].uri, "4e5d4d4009.png");
   });
 
   it('should save to a new gltf file when the -o parameter is specified', async () => {
@@ -57,7 +57,7 @@ describe('gltf-content-hash', () => {
     assert.ok(outGltfFilename);
 
     const gltf = await fs.readJson(path.join(outputGltfPath, outGltfFilename));
-    assert.equal(gltf.images[0].uri, "Avocado_baseColor-4e5d4d4009.png");
+    assert.equal(gltf.images[0].uri, "4e5d4d4009.png");
   });
 
   afterEach(async () => {
@@ -81,7 +81,7 @@ describe('addComponentData', () => {
     
     const { gltf, fileName } = await contentHashUrls(tempGltfPath, inGltf);
 
-    assert.equal(gltf.images[0].uri, "Avocado_baseColor-4e5d4d4009.png");
+    assert.equal(gltf.images[0].uri, "4e5d4d4009.png");
   });
 
   afterEach(async () => {
